@@ -3,11 +3,11 @@
       "target": "ES6",
       "module": "commonjs",
       "outDir": "./dist",
-      "rootDir": "./src",
+      "rootDir": "server/src",
       "strict": true,
       "esModuleInterop": true,
       "skipLibCheck": true
     },
-    "include": ["src/**/*.ts"],
+    "include": ["server/src/**/*.ts"],
     "exclude": ["node_modules"]
   }

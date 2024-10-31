@@ -2,8 +2,11 @@ import express, { Request, Response } from 'express';
 import axios from 'axios';
 
 const app = express();
+const cors = require('cors');
 const PORT = process.env.PORT || 3000;
 const BASEURL = 'https://api.spaceflightnewsapi.net/v4/articles/';
+
+app.use(cors())
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Hello, World!');
