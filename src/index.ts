@@ -11,8 +11,8 @@ app.get('/', (req: Request, res: Response) => {
 
 app.get('/api/articles', async (req: Request, res: Response) => {
     try {
-      const response = await axios.get('${BASEURL}');
-      res.json(response.data);
+      const response = await axios.get(`${BASEURL}`);
+      res.send(response.data);
     } catch (error) {
       res.status(500).json({ message: 'Error occurred' });
     }
@@ -23,7 +23,7 @@ app.get('/api/articles/:id', async (req: Request, res: Response) => {
     try {
         const response = await axios.get(`${BASEURL}${id}`);
         console.log(response.data);
-        res.json(response.data);
+        res.send(response.data);
     } catch (error) {
       res.status(500).json({ message: 'Error occurred' });
     }
