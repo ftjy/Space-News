@@ -20,7 +20,7 @@ function App() {
   const [data, setData] = useState([])
 
   const getAllArticles = () => {
-    axios.get('http://localhost:3000/api/articles').then((response) => {
+    axios.get('http://localhost:3000/').then((response) => {
       setData(response.data);
       console.log(data);
     })
