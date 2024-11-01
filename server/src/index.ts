@@ -6,7 +6,7 @@ const cors = require('cors');
 const PORT = process.env.PORT || 3000;
 const BASEURL = 'https://api.spaceflightnewsapi.net/v4/articles/';
 
-app.use(cors())
+app.use(cors());
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Hello, World!');
