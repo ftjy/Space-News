@@ -8,11 +8,7 @@ const BASEURL = 'https://api.spaceflightnewsapi.net/v4/articles/';
 
 app.use(cors());
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('Hello, World!');
-});
-
-app.get('/api/articles', async (req: Request, res: Response) => {
+app.get('/', async (req: Request, res: Response) => {
     try {
       const response = await axios.get(`${BASEURL}`);
       res.send(response.data);
