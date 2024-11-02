@@ -18,5 +18,5 @@ model comment {
   username String
   alias String
   comment String
-  date Date
+  date DateTime
 }
