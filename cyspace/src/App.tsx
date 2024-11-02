@@ -1,4 +1,4 @@
-import React, { useState, useEffect }  from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import axios from 'axios';
 import CardActions from '@mui/material/CardActions';
@@ -14,7 +14,7 @@ import { styled } from '@mui/material/styles';
 interface ArticleResponse {
   count: number;
   next: string;
-  previous:  string;
+  previous: string;
   results: Article[];
 }
 
@@ -59,16 +59,15 @@ const Item = styled(Paper)(({ theme }) => ({
 
 
 function App() {
-const [articleResponse, setArticleResponse] = useState<ArticleResponse>();
-const [error, setError] = useState<string | null>(null);
-const [data, setData] = useState([])
+  const [articleResponse, setArticleResponse] = useState<ArticleResponse>();
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const data = await fetchArticles();
-        console.log(data);
-        setArticleResponse(articleResponse);
+        const articles = await fetchArticles();
+        console.log(articles);
+        setArticleResponse(articles);
       } catch (error) {
         console.error(error);
       }
@@ -81,14 +80,19 @@ const [data, setData] = useState([])
   }
 
   return (
-    <div>
-      {articleResponse?.results?.map((article) => (
-        <div key={article.id}>
-          <Box sx={{ flexGrow: 2 }}>
-            <Grid container spacing={2}>
-              <Grid size={{ xs: 6, md: 8 }}>
+    <div className="title-container">
+      <div>
+        <Box sx={{ flexGrow: 2 }}>
+          <Grid
+            container
+            spacing={12}
+            alignItems="center"
+            justifyContent="center"
+            direction="column">
+            {articleResponse?.results?.map((article) => (
+              <Grid key={article.id} size={{ xs: 8, md: 8 }}>
                 <Item>
-                  <Card variant="outlined" sx={{ margin: 10}}>
+                  <Card variant="outlined" sx={{ margin: 10 }}>
                     <CardContent>
                       <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14 }}>
                         {article.title}
@@ -107,14 +111,13 @@ const [data, setData] = useState([])
                   </Card>
                 </Item>
               </Grid>
-            </Grid>
-          </Box>
-        </div>
-      ))}
+            ))}
+          </Grid>
+        </Box>
+      </div>
     </div>
   );
 }
 
 
 export default App;
-
