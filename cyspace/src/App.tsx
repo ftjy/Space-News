@@ -9,11 +9,11 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<ArticlesScreen />} />
-        {/* <Route path="/:Id" element={<CommentsScreen />} /> */}
+        <Route path="/article" element={<CommentsScreen />} />
       </Routes>
     </Router>
   );
 }
 
 
-export default App;
+export default App;

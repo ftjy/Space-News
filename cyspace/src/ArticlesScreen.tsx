@@ -9,6 +9,7 @@ import Paper from '@mui/material/Paper';
 import { styled } from '@mui/material/styles';
 import React, { useState, useEffect, MouseEvent, MouseEventHandler, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { TextField } from '@mui/material';
 
 interface ArticleResponse {
     count: number;
@@ -53,6 +54,11 @@ const handleMouseEvent = (e: MouseEvent<HTMLButtonElement>) => {
     alert("HELLO");
 };
 
+function search(text: String) {
+    console.log(text);
+    searchArticles(text);
+}
+
 async function getArticles(): Promise<ArticleResponse> {
     const response = await fetch('http://localhost:3000/');
     console.log(response)
@@ -61,8 +67,8 @@ async function getArticles(): Promise<ArticleResponse> {
 }
 
 
-async function getArticleById(id: number): Promise<ArticleResponse> {
-    const response = await fetch('http://localhost:3000/api/articles/' + id);
+async function searchArticles(titleText: String): Promise<ArticleResponse> {
+    const response = await fetch('http://localhost:3000/api/articles/search/' + titleText);
     console.log(response);
     const data = await response.json();
     return data;
@@ -92,6 +98,7 @@ function ArticlesScreen() {
 
     return (
         <div>
+            <TextField onChange={(e) => {search(e.target.value);}}/>
             <Box sx={{ flexGrow: 2 }}>
                 <Grid
                     container
@@ -114,11 +121,11 @@ function ArticlesScreen() {
                                             {article.title}
                                         </Typography>
                                         <Typography sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'left' }}>
-                                            {article.news_site} / <a href={article.url}>{article.url}</a>
+                                            {article.news_site}/<a href={article.url}>{article.url}</a>
                                         </Typography>
                                     </CardContent>
                                     <CardActions>
-                                        <Button onClick={() => navigate(`/${article.id}`)} size="small" sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'right' }}>Comments</Button>
+                                        <Button onClick={() => navigate('/article', { state: { articleId: article.id } })} size="small" sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'right' }}>Comments</Button>
                                     </CardActions>
                                 </Card>
                             </Item>
@@ -131,4 +138,4 @@ function ArticlesScreen() {
 
 }
 
-export default ArticlesScreen;
+export default ArticlesScreen;

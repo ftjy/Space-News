@@ -16,12 +16,7 @@ datasource db {
 model comment {
   id Int @id @default(autoincrement())
   username String
+  alias String
   comment String
   date Date
-}
-
-model article{
-  id Int @id @default(autoincrement())
-  publishDate Date
-  title String
 }
