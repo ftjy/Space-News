@@ -9,7 +9,8 @@ import Paper from '@mui/material/Paper';
 import { styled } from '@mui/material/styles';
 import React, { useState, useEffect, MouseEvent, MouseEventHandler, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TextField } from '@mui/material';
+import { InputAdornment, TextField } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
 
 interface ArticleResponse {
     count: number;
@@ -49,35 +50,40 @@ const Item = styled(Paper)(({ theme }) => ({
     }),
 }));
 
-const handleMouseEvent = (e: MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    alert("HELLO");
-};
-
-function search(text: String) {
-    console.log(text);
-    searchArticles(text);
-}
-
-async function getArticles(): Promise<ArticleResponse> {
-    const response = await fetch('http://localhost:3000/');
-    console.log(response)
-    const data = await response.json();
-    return data;
-}
-
-
-async function searchArticles(titleText: String): Promise<ArticleResponse> {
-    const response = await fetch('http://localhost:3000/api/articles/search/' + titleText);
-    console.log(response);
-    const data = await response.json();
-    return data;
-}
-
 function ArticlesScreen() {
     const [articleResponse, setArticleResponse] = useState<ArticleResponse>();
     const [error, setError] = useState<string | null>(null);
+    const [searchString, setSearchString] = useState<String>();
     const navigate = useNavigate();
+
+    function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+        console.log(event.key);
+        if (event.key == "Enter") {
+            console.log(searchString);
+            search(searchString!);
+        }
+    }
+
+    async function search(text: String) {
+        console.log(text);
+        const searchResults = await searchArticles(text);
+        console.log(searchResults);
+        setArticleResponse(searchResults);
+    }
+
+    async function getArticles(): Promise<ArticleResponse> {
+        const response = await fetch('http://localhost:3000/');
+        console.log(response)
+        const data = await response.json();
+        return data;
+    }
+
+    async function searchArticles(titleText: String): Promise<ArticleResponse> {
+        const response = await fetch('http://localhost:3000/api/articles/search/' + titleText);
+        console.log(response);
+        const data = await response.json();
+        return data;
+    }
 
     useEffect(() => {
         async function fetchData() {
@@ -98,7 +104,24 @@ function ArticlesScreen() {
 
     return (
         <div>
-            <TextField onChange={(e) => {search(e.target.value);}}/>
+            <TextField
+                onKeyDown={handleKeyDown}
+                onChange={(e) => { setSearchString(e.target.value); }}
+                type="search"
+                placeholder="Search"
+                InputProps={{
+                    style: {
+                        fontSize: 12,
+                        width: 200,
+                        height: 40
+                    },
+                    startAdornment: (
+                        <InputAdornment position="start">
+                            <SearchIcon />
+                        </InputAdornment>
+                    )
+                }}
+            />
             <Box sx={{ flexGrow: 2 }}>
                 <Grid
                     container
@@ -138,4 +161,4 @@ function ArticlesScreen() {
 
 }
 
-export default ArticlesScreen;
+export default ArticlesScreen;

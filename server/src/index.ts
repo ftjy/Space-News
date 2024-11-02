@@ -30,12 +30,12 @@ app.get('/api/articles/:id', async (req: Request, res: Response) => {
 
 app.get('/api/articles/search/:titleText', async (req: Request, res: Response) => {
   const { titleText } = req.params;
-  console.log(titleText);
+  console.log(titleText)
   try {
     const response = await axios.get(`${BASEURL}`,
       {
         params: {
-          title_contains: {titleText}
+          title_contains: titleText
         }
       });
     console.log(response.data);
