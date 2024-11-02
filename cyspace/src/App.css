@@ -36,12 +36,3 @@
     transform: rotate(360deg);
   }
 }
-
-.title-class {
-  box-shadow: inset;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  max-width: 75%;
-  padding: 1rem;
-}

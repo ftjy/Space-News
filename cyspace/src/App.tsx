@@ -1,17 +1,17 @@
 import React, { useState, useEffect, MouseEvent, MouseEventHandler } from 'react';
 import './App.css';
-import { NavigationContainer } from '@react-navigation/native';
 import ArticlesScreen from './ArticlesScreen';
 import CommentsScreen from './CommentsScreen';
-
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 
 function App() {
-
   return (
-    <NavigationContainer>
-      <ArticlesScreen />
-      {/* <CommentsScreen /> */}
-    </NavigationContainer>
+    <Router>
+      <Routes>
+        <Route path="/" element={<ArticlesScreen />} />
+        {/* <Route path="/:Id" element={<CommentsScreen />} /> */}
+      </Routes>
+    </Router>
   );
 }
 
