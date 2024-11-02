@@ -25,8 +25,8 @@ interface Article {
   image_url: string;
   news_site: string;
   summary: String;
-  published_at: Date;
-  updated_at: Date;
+  published_at: String;
+  updated_at: String;
   launches: [];
   events: [];
 }
@@ -94,19 +94,18 @@ function App() {
                 <Item>
                   <Card variant="outlined" sx={{ margin: 10 }}>
                     <CardContent>
-                      <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14 }}>
+                      <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14, textAlign: 'left' }}>
                         {article.title}
                       </Typography>
-                      <Typography variant="h5" component="div">
-                        {article.summary}
+                      <Typography sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'left' }}>
+                        {article.published_at}
                       </Typography>
-                      <Typography sx={{ color: 'text.secondary', mb: 1.5 }}>adjective</Typography>
-                      <Typography variant="body2">
-                        <a href={article.url}>{article.url}</a>
+                      <Typography sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'left' }}>
+                        {article.news_site} / <a href={article.url}>{article.url}</a>
                       </Typography>
                     </CardContent>
                     <CardActions>
-                      <Button size="small">Learn More</Button>
+                      <Button size="small">Comments</Button>
                     </CardActions>
                   </Card>
                 </Item>
