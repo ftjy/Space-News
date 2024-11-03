@@ -1,3 +1,4 @@
+import './ArticlesScreen.css';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
@@ -7,7 +8,7 @@ import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid2';
 import Paper from '@mui/material/Paper';
 import { styled } from '@mui/material/styles';
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { InputAdornment, TextField } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
@@ -40,6 +41,15 @@ interface Article {
     events: [];
 }
 
+interface topCommenters {
+    username: string;
+    count: number;
+}
+
+interface avgComments {
+    countperday: number;
+}
+
 function convertDateToString(dateObject: Date): string {
     const date = new Date(dateObject);
     const dateString: string = ('0' + date.getDate()).slice(-2) + "/" + ('0' + (date.getMonth() + 1)).slice(-2) + "/" + date.getFullYear();
@@ -68,6 +78,8 @@ function ArticlesScreen() {
     const [minStartDate, setMinStartDate] = useState<Dayjs>();
     const [startDateErrorMsg, setStartDateErrorMsg] = React.useState<DateValidationError | null>(null);
     const [endDateErrorMsg, setEndDateErrorMsg] = React.useState<DateValidationError | null>(null);
+    const [avgCommentsPerDay, setAvgCommentsPerDay] = useState<number>();
+    const [topCommenters, setTopCommenters] = useState<topCommenters[]>();
     const navigate = useNavigate();
 
     function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
@@ -86,15 +98,15 @@ function ArticlesScreen() {
     }
 
     async function searchByDate() {
-        if(dayjs(startDate).isValid() && dayjs(endDate).isValid()){
+        if (dayjs(startDate).isValid() && dayjs(endDate).isValid()) {
             const startDateIso = startDate?.toISOString()
             const endDateIso = endDate?.toISOString()
             const searchResults = await searchArticlesByDate(startDateIso!, endDateIso!);
             console.log(searchResults);
             setArticleResponse(searchResults);
-        } else if(dayjs(startDate).isValid()){
+        } else if (dayjs(startDate).isValid()) {
             // error message for beforeDate
-        } else if(dayjs(endDate).isValid()) {
+        } else if (dayjs(endDate).isValid()) {
             // error message for afterDate
         }
     }
@@ -117,18 +129,40 @@ function ArticlesScreen() {
         const response = await fetch('http://localhost:3000/api/articles/search/date/', {
             headers: { 'Content-type': 'application/json' },
             method: 'POST',
-            body: JSON.stringify({ startDate: dateBefore, endDate: dateAfter})
+            body: JSON.stringify({ startDate: dateBefore, endDate: dateAfter })
         });
         console.log(response);
         const data = await response.json();
         return data;
     }
 
+    async function getTopComments(): Promise<topCommenters[]> {
+        const response = await fetch('http://localhost:3000/api/articles/comment/retrieve/commenters/top');
+        console.log(response);
+        const data = await response.json();
+        return data;
+    }
+
+    async function getAvgComments(): Promise<avgComments[]> {
+        const response = await fetch('http://localhost:3000/api/articles/comment/retrieve/commenters/avg');
+        console.log(response);
+        const data = await response.json();
+        return data;
+    }
+
+    
+
     async function fetchData() {
         try {
             const articles = await getArticles();
+            const topComments = await getTopComments();
+            const avgComments = await getAvgComments();
             console.log(articles);
+            console.log(topComments);
+            console.log(avgComments);
             setArticleResponse(articles);
+            setTopCommenters(topComments);
+            setAvgCommentsPerDay(avgComments[0].countperday);
         } catch (error) {
             console.error(error);
         }
@@ -144,6 +178,39 @@ function ArticlesScreen() {
 
     return (
         <div>
+            <div>
+                <Box sx={{ flexGrow: 2 }}>
+                    <Card variant="outlined" sx={{ margin: 10 }}>
+                    <Typography sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'right' }}>
+                        Top 3 commenters
+                    </Typography>
+                    {topCommenters?.map((topComment) => (
+                        <CardContent>
+                            <Typography sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'right' }}>
+                                {topComment.username}
+                            </Typography>
+                            <Typography gutterBottom sx={{ fontSize: 20, textAlign: 'left' }}>
+                                {topComment.count} Comments
+                            </Typography>
+                        </CardContent>
+                    ))}
+                    </Card>
+            </Box>
+            </div>
+            <div>
+                <Box sx={{ flexGrow: 2 }}>
+                    <Card variant="outlined" sx={{ margin: 10 }}>
+                        <CardContent>
+                            <Typography sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'right' }}>
+                                Average Comments/Day
+                            </Typography>
+                            <Typography gutterBottom sx={{ fontSize: 20, textAlign: 'left' }}>
+                                {avgCommentsPerDay} comments
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                </Box>
+            </div>
             <div>
                 <TextField
                     onKeyDown={handleKeyDown}
@@ -165,8 +232,9 @@ function ArticlesScreen() {
                 />
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DemoContainer components={['DatePicker', 'DatePicker']}>
-                        <DatePicker label="Start Date" 
+                        <DatePicker label="Start Date"
                             // defaultValue={dayjs().add(-14, 'day')}
+                            slotProps={{ textField: { size: 'small' } }}
                             value={startDate ?? null}
                             format="DD/MM/YYYY"
                             maxDate={maxEndDate}
@@ -180,10 +248,11 @@ function ArticlesScreen() {
                             //       helperText: endDateErrorMsg,
                             //     },
                             //   }}
-                            disableFuture 
+                            disableFuture
                         />
                         <DatePicker label="End Date"
                             // defaultValue={dayjs().add(-7, 'day')}
+                            slotProps={{ textField: { size: 'small' } }}
                             value={endDate ?? null}
                             minDate={minStartDate}
                             format="DD/MM/YYYY"
@@ -197,13 +266,13 @@ function ArticlesScreen() {
                             //       helperText: endDateErrorMsg,
                             //     },
                             //   }}
-                            disableFuture 
+                            disableFuture
                         />
                     </DemoContainer>
                 </LocalizationProvider>
-                <Button onClick={() => searchByDate()} size="small" sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'right' }}>Search By Date</Button>
+                <Button onClick={() => searchByDate()} size="small" sx={{ color: 'text.secondary', mb: 1.5, fontSize: 12, textAlign: 'right' }}>Search By Date</Button>
             </div>
-            
+
             <Box sx={{ flexGrow: 2 }}>
                 <Grid
                     container
@@ -230,7 +299,7 @@ function ArticlesScreen() {
                                         </Typography>
                                     </CardContent>
                                     <CardActions>
-                                        <Button onClick={() => navigate('/article', { state: { articleId: article.id } })} size="small" sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'right' }}><CommentIcon/></Button>
+                                        <Button onClick={() => navigate('/article', { state: { articleId: article.id } })} size="small" sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'right' }}><CommentIcon /></Button>
                                     </CardActions>
                                 </Card>
                             </Item>
@@ -243,4 +312,4 @@ function ArticlesScreen() {
 
 }
 
-export default ArticlesScreen;
+export default ArticlesScreen;

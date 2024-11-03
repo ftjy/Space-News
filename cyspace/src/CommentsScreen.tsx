@@ -1,4 +1,4 @@
-import { useForm, Controller, SubmitHandler } from "react-hook-form"
+import './CommentsScreen.css';
 import { Box, Input, TextField } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import Paper from '@mui/material/Paper';
@@ -24,7 +24,8 @@ interface Article {
     events: [];
 }
 
-interface IFormInput {
+interface commentState {
+    articleId: string
     alias: string
     comment: string
 }
@@ -65,20 +66,41 @@ function CommentsScreen() {
     const [error, setError] = useState<string | null>(null);
     const [comments, setComments] = useState<Comment[]>();
     const navigate = useNavigate();
-    const { control, handleSubmit } = useForm({
-        defaultValues: {
-          alias: "",
-          comment: ""
-        },
-      })
+    const [formData, setFormData] = useState<commentState> ({
+        articleId: articleId,
+        alias: '',
+        comment: ''
+    })
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const {name, value} = e.target;
+        setFormData(prevData => ({...prevData, [name]: value}))
+    }
+
+    const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        try {
+          const response = await fetch('http://localhost:3000/api/articles/comment/create', {
+            headers: { 'Content-type': 'application/json' },
+            method: 'POST',
+            body: JSON.stringify({formData})
+        })
+        .then(async () => {
+            setComments(await getCommentsByArticleId(articleId));
+        })
+        .then(()=> onCancel());
+          console.log(response);
+        }catch (error) {
+          console.error(error);
+        }
+    }
     
-    const onSubmit: SubmitHandler<IFormInput> = (data) => {
-        console.log(data)
-    }
-
-    function onCancel() {
-
-    }
+    function onCancel(){
+        setFormData({
+            articleId: articleId,
+            alias: '',
+            comment: ''})
+    };
 
     async function getArticleById(id: number): Promise<Article> {
         const response = await fetch('http://localhost:3000/api/articles/' + id);
@@ -136,18 +158,20 @@ function CommentsScreen() {
                 </CardContent>
 
             </Card>
-            <form onSubmit={handleSubmit(onSubmit)}>
-                <Controller
-                    name="alias"
-                    control={control}
-                    render={({ field }) => <Input {...field} />}
-                />
-                <Controller
-                    name="comment"
-                    control={control}
-                    render={({ field }) => <Input {...field} />}
-                />
-                <Button value="cancel" onClick={() => {onCancel()}} size="small" sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'right' }}>Cancel</Button>
+            <form onSubmit={handleSubmit}>
+                <div>
+                    <label htmlFor="alias"> Username: </label>
+                    <br/>
+                    <input type="text" name="alias" id="alias" onChange={handleChange} value={formData.alias} required maxLength={66}></input>
+                    <br/>
+                </div>
+                <div>
+                    <label htmlFor="comment"> Comment: </label>
+                    <br/>
+                    <input className="input-text-comment" type="text" name="comment" id="comment" onChange={handleChange} value={formData.comment} required maxLength={4000}></input>
+                    <br/>
+                </div>
+                <Button value="cancel" onClick={onCancel}type="reset" size="small" sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'right' }}>Cancel</Button>
                 <Button value="publish" type="submit" size="small" sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'right' }}>Publish</Button>
             </form>
             <div>

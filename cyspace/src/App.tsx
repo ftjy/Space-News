@@ -1,4 +1,3 @@
-import React, { useState, useEffect, MouseEvent, MouseEventHandler } from 'react';
 import './App.css';
 import ArticlesScreen from './ArticlesScreen';
 import CommentsScreen from './CommentsScreen';
