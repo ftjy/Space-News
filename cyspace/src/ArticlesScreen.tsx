@@ -7,10 +7,18 @@ import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid2';
 import Paper from '@mui/material/Paper';
 import { styled } from '@mui/material/styles';
-import React, { useState, useEffect, MouseEvent, MouseEventHandler, useRef } from 'react';
+import React, { useState, useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { InputAdornment, TextField } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import CommentIcon from '@mui/icons-material/Comment';
+import dayjs, { Dayjs } from 'dayjs';
+import { DateValidationError } from '@mui/x-date-pickers/models';
+
 
 interface ArticleResponse {
     count: number;
@@ -54,6 +62,12 @@ function ArticlesScreen() {
     const [articleResponse, setArticleResponse] = useState<ArticleResponse>();
     const [error, setError] = useState<string | null>(null);
     const [searchString, setSearchString] = useState<String>();
+    const [startDate, setStartDate] = useState<Dayjs>();
+    const [endDate, setEndDate] = useState<Dayjs>();
+    const [maxEndDate, setMaxEndDate] = useState<Dayjs>();
+    const [minStartDate, setMinStartDate] = useState<Dayjs>();
+    const [startDateErrorMsg, setStartDateErrorMsg] = React.useState<DateValidationError | null>(null);
+    const [endDateErrorMsg, setEndDateErrorMsg] = React.useState<DateValidationError | null>(null);
     const navigate = useNavigate();
 
     function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
@@ -71,6 +85,20 @@ function ArticlesScreen() {
         setArticleResponse(searchResults);
     }
 
+    async function searchByDate() {
+        if(dayjs(startDate).isValid() && dayjs(endDate).isValid()){
+            const startDateIso = startDate?.toISOString()
+            const endDateIso = endDate?.toISOString()
+            const searchResults = await searchArticlesByDate(startDateIso!, endDateIso!);
+            console.log(searchResults);
+            setArticleResponse(searchResults);
+        } else if(dayjs(startDate).isValid()){
+            // error message for beforeDate
+        } else if(dayjs(endDate).isValid()) {
+            // error message for afterDate
+        }
+    }
+
     async function getArticles(): Promise<ArticleResponse> {
         const response = await fetch('http://localhost:3000/');
         console.log(response)
@@ -85,16 +113,28 @@ function ArticlesScreen() {
         return data;
     }
 
-    useEffect(() => {
-        async function fetchData() {
-            try {
-                const articles = await getArticles();
-                console.log(articles);
-                setArticleResponse(articles);
-            } catch (error) {
-                console.error(error);
-            }
+    async function searchArticlesByDate(dateBefore: String, dateAfter: String): Promise<ArticleResponse> {
+        const response = await fetch('http://localhost:3000/api/articles/search/date/', {
+            headers: { 'Content-type': 'application/json' },
+            method: 'POST',
+            body: JSON.stringify({ startDate: dateBefore, endDate: dateAfter})
+        });
+        console.log(response);
+        const data = await response.json();
+        return data;
+    }
+
+    async function fetchData() {
+        try {
+            const articles = await getArticles();
+            console.log(articles);
+            setArticleResponse(articles);
+        } catch (error) {
+            console.error(error);
         }
+    }
+
+    useEffect(() => {
         fetchData();
     }, []);
 
@@ -104,24 +144,66 @@ function ArticlesScreen() {
 
     return (
         <div>
-            <TextField
-                onKeyDown={handleKeyDown}
-                onChange={(e) => { setSearchString(e.target.value); }}
-                type="search"
-                placeholder="Search"
-                InputProps={{
-                    style: {
-                        fontSize: 12,
-                        width: 200,
-                        height: 40
-                    },
-                    startAdornment: (
-                        <InputAdornment position="start">
-                            <SearchIcon />
-                        </InputAdornment>
-                    )
-                }}
-            />
+            <div>
+                <TextField
+                    onKeyDown={handleKeyDown}
+                    onChange={(e) => { setSearchString(e.target.value); }}
+                    type="search"
+                    placeholder="Search"
+                    InputProps={{
+                        style: {
+                            fontSize: 12,
+                            width: 200,
+                            height: 40
+                        },
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <SearchIcon />
+                            </InputAdornment>
+                        )
+                    }}
+                />
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DemoContainer components={['DatePicker', 'DatePicker']}>
+                        <DatePicker label="Start Date" 
+                            // defaultValue={dayjs().add(-14, 'day')}
+                            value={startDate ?? null}
+                            format="DD/MM/YYYY"
+                            maxDate={maxEndDate}
+                            onChange={(value) => {
+                                setStartDate(value!);
+                                setMinStartDate(value!);
+                            }}
+                            // onError={(endDateErrorMsg) => setEndDateErrorMsg(endDateErrorMsg)}
+                            // slotProps={{
+                            //     textField: {
+                            //       helperText: endDateErrorMsg,
+                            //     },
+                            //   }}
+                            disableFuture 
+                        />
+                        <DatePicker label="End Date"
+                            // defaultValue={dayjs().add(-7, 'day')}
+                            value={endDate ?? null}
+                            minDate={minStartDate}
+                            format="DD/MM/YYYY"
+                            onChange={(value) => {
+                                setEndDate(value!);
+                                setMaxEndDate(value!);
+                            }}
+                            // onError={(endDateErrorMsg) => setEndDateErrorMsg(endDateErrorMsg)}
+                            // slotProps={{
+                            //     textField: {
+                            //       helperText: endDateErrorMsg,
+                            //     },
+                            //   }}
+                            disableFuture 
+                        />
+                    </DemoContainer>
+                </LocalizationProvider>
+                <Button onClick={() => searchByDate()} size="small" sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'right' }}>Search By Date</Button>
+            </div>
+            
             <Box sx={{ flexGrow: 2 }}>
                 <Grid
                     container
@@ -148,7 +230,7 @@ function ArticlesScreen() {
                                         </Typography>
                                     </CardContent>
                                     <CardActions>
-                                        <Button onClick={() => navigate('/article', { state: { articleId: article.id } })} size="small" sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'right' }}>Comments</Button>
+                                        <Button onClick={() => navigate('/article', { state: { articleId: article.id } })} size="small" sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'right' }}><CommentIcon/></Button>
                                     </CardActions>
                                 </Card>
                             </Item>
@@ -161,4 +243,4 @@ function ArticlesScreen() {
 
 }
 
-export default ArticlesScreen;
+export default ArticlesScreen;
