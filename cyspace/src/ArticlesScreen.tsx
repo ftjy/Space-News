@@ -19,6 +19,9 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import CommentIcon from '@mui/icons-material/Comment';
 import dayjs, { Dayjs } from 'dayjs';
 import { DateValidationError } from '@mui/x-date-pickers/models';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import Container from 'react-bootstrap/Container';
 
 
 interface ArticleResponse {
@@ -150,8 +153,6 @@ function ArticlesScreen() {
         return data;
     }
 
-    
-
     async function fetchData() {
         try {
             const articles = await getArticles();
@@ -178,135 +179,164 @@ function ArticlesScreen() {
 
     return (
         <div>
-            <div>
-                <Box sx={{ flexGrow: 2 }}>
-                    <Card variant="outlined" sx={{ margin: 10 }}>
-                    <Typography sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'right' }}>
-                        Top 3 commenters
-                    </Typography>
-                    {topCommenters?.map((topComment) => (
-                        <CardContent>
-                            <Typography sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'right' }}>
-                                {topComment.username}
-                            </Typography>
-                            <Typography gutterBottom sx={{ fontSize: 20, textAlign: 'left' }}>
-                                {topComment.count} Comments
-                            </Typography>
-                        </CardContent>
-                    ))}
-                    </Card>
-            </Box>
-            </div>
-            <div>
-                <Box sx={{ flexGrow: 2 }}>
-                    <Card variant="outlined" sx={{ margin: 10 }}>
-                        <CardContent>
-                            <Typography sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'right' }}>
-                                Average Comments/Day
-                            </Typography>
-                            <Typography gutterBottom sx={{ fontSize: 20, textAlign: 'left' }}>
-                                {avgCommentsPerDay} comments
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Box>
-            </div>
-            <div>
-                <TextField
-                    onKeyDown={handleKeyDown}
-                    onChange={(e) => { setSearchString(e.target.value); }}
-                    type="search"
-                    placeholder="Search"
-                    InputProps={{
-                        style: {
-                            fontSize: 12,
-                            width: 200,
-                            height: 40
-                        },
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <SearchIcon />
-                            </InputAdornment>
-                        )
-                    }}
-                />
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DemoContainer components={['DatePicker', 'DatePicker']}>
-                        <DatePicker label="Start Date"
-                            // defaultValue={dayjs().add(-14, 'day')}
-                            slotProps={{ textField: { size: 'small' } }}
-                            value={startDate ?? null}
-                            format="DD/MM/YYYY"
-                            maxDate={maxEndDate}
-                            onChange={(value) => {
-                                setStartDate(value!);
-                                setMinStartDate(value!);
+            <Container>
+                <Row>
+                    <Col>
+                        <h1>Space Blog</h1>
+                    </Col>
+                </Row>
+            </Container>
+            <br/>
+            <Container>
+                <Row>
+                    <Col>
+                        <Item>
+                            <Row>
+                                <Col>  
+                                    <h3>Top 3 commenters</h3>
+                                </Col>
+                            </Row>
+                            {topCommenters?.map((topComment) => (
+                            <Row>
+                                <Col>
+                                    {topComment.username}
+                                </Col>
+                                <Col>
+                                    {topComment.count} Comments
+                                </Col>
+                            </Row>
+                            ))}
+                        </Item>
+                    </Col>
+                    <Col>
+                        <Item>
+                            <Row>
+                                <Col>
+                                    <h3>Average Comments/Day</h3>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col>
+                                    {avgCommentsPerDay} comments
+                                </Col>
+                            </Row>
+                        </Item>
+                    </Col>
+                </Row>
+            </Container>
+            <br/>
+            <Container>
+                <Row>
+                    <Col>
+                        <TextField
+                            onKeyDown={handleKeyDown}
+                            onChange={(e) => { setSearchString(e.target.value); }}
+                            type="search"
+                            placeholder="Search"
+                            InputProps={{
+                                style: {
+                                    fontSize: 12,
+                                    width: 200,
+                                    height: 40
+                                },
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <SearchIcon />
+                                    </InputAdornment>
+                                )
                             }}
-                            // onError={(endDateErrorMsg) => setEndDateErrorMsg(endDateErrorMsg)}
-                            // slotProps={{
-                            //     textField: {
-                            //       helperText: endDateErrorMsg,
-                            //     },
-                            //   }}
-                            disableFuture
                         />
-                        <DatePicker label="End Date"
-                            // defaultValue={dayjs().add(-7, 'day')}
-                            slotProps={{ textField: { size: 'small' } }}
-                            value={endDate ?? null}
-                            minDate={minStartDate}
-                            format="DD/MM/YYYY"
-                            onChange={(value) => {
-                                setEndDate(value!);
-                                setMaxEndDate(value!);
-                            }}
-                            // onError={(endDateErrorMsg) => setEndDateErrorMsg(endDateErrorMsg)}
-                            // slotProps={{
-                            //     textField: {
-                            //       helperText: endDateErrorMsg,
-                            //     },
-                            //   }}
-                            disableFuture
-                        />
-                    </DemoContainer>
-                </LocalizationProvider>
-                <Button onClick={() => searchByDate()} size="small" sx={{ color: 'text.secondary', mb: 1.5, fontSize: 12, textAlign: 'right' }}>Search By Date</Button>
-            </div>
-
-            <Box sx={{ flexGrow: 2 }}>
-                <Grid
-                    container
-                    spacing={12}
-                    alignItems="center"
-                    justifyContent="center"
-                    direction="column">
-                    {articleResponse?.results?.map((article) => (
-                        <Grid key={article.id} size={{ xs: 8, md: 8 }}>
-                            <Item>
-                                <Card variant="outlined" sx={{ margin: 10 }}>
-                                    <CardContent>
-                                        <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14, textAlign: 'left' }}>
-                                            <img src={article.image_url} width={250} height={250}></img>
-                                        </Typography>
-                                        <Typography sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'right' }}>
-                                            {convertDateToString(article.published_at)}
-                                        </Typography>
-                                        <Typography gutterBottom sx={{ fontSize: 20, textAlign: 'left' }}>
-                                            {article.title}
-                                        </Typography>
-                                        <Typography sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'left' }}>
-                                            {article.news_site}/<a href={article.url}>{article.url}</a>
-                                        </Typography>
-                                    </CardContent>
-                                    <CardActions>
-                                        <Button onClick={() => navigate('/article', { state: { articleId: article.id } })} size="small" sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'right' }}><CommentIcon /></Button>
-                                    </CardActions>
-                                </Card>
-                            </Item>
-                        </Grid>
-                    ))}
-                </Grid>
-            </Box>
+                    </Col>
+                    <Col className="search-button-right">
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DemoContainer components={['DatePicker', 'DatePicker']}>
+                                <DatePicker label="Start Date"
+                                    // defaultValue={dayjs().add(-14, 'day')}
+                                    slotProps={{ textField: { size: 'small' } }}
+                                    value={startDate ?? null}
+                                    format="DD/MM/YYYY"
+                                    maxDate={maxEndDate}
+                                    onChange={(value) => {
+                                        setStartDate(value!);
+                                        setMinStartDate(value!);
+                                    }}
+                                    // onError={(endDateErrorMsg) => setEndDateErrorMsg(endDateErrorMsg)}
+                                    // slotProps={{
+                                    //     textField: {
+                                    //       helperText: endDateErrorMsg,
+                                    //     },
+                                    //   }}
+                                    disableFuture
+                                />
+                                <div className="datepicker-split-empty-space"></div>
+                                <DatePicker label="End Date"
+                                    // defaultValue={dayjs().add(-7, 'day')}
+                                    slotProps={{ textField: { size: 'small' } }}
+                                    value={endDate ?? null}
+                                    minDate={minStartDate}
+                                    format="DD/MM/YYYY"
+                                    onChange={(value) => {
+                                        setEndDate(value!);
+                                        setMaxEndDate(value!);
+                                    }}
+                                    // onError={(endDateErrorMsg) => setEndDateErrorMsg(endDateErrorMsg)}
+                                    // slotProps={{
+                                    //     textField: {
+                                    //       helperText: endDateErrorMsg,
+                                    //     },
+                                    //   }}
+                                    disableFuture
+                                />
+                            </DemoContainer>
+                        </LocalizationProvider>
+                        <div className="search-button-right">
+                            <Button className="search-button" onClick={() => searchByDate()}>Search By Date</Button>
+                        </div>
+                    </Col>
+                </Row>
+            </Container>
+            <Container>
+                <Row>
+                    <Col>
+                        <Box sx={{ flexGrow: 2 }}>
+                            <Grid
+                                container
+                                spacing={12}
+                                alignItems="center"
+                                justifyContent="center"
+                                direction="column">
+                                {articleResponse?.results?.map((article) => (
+                                    <Grid key={article.id} size={{ md: 12 }}>
+                                        <Item>
+                                            <Card variant="outlined" sx={{ margin: 10 }}>
+                                                <CardContent>
+                                                    <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14, textAlign: 'left' }}>
+                                                        <img src={article.image_url} width={250} height={250}></img>
+                                                    </Typography>
+                                                    <Typography sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'right' }}>
+                                                        {convertDateToString(article.published_at)}
+                                                    </Typography>
+                                                    <Typography gutterBottom sx={{ fontSize: 20, textAlign: 'left' }}>
+                                                        {article.title}
+                                                    </Typography>
+                                                    <Typography sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'left' }}>
+                                                        {article.news_site}/<a href={article.url}>{article.url}</a>
+                                                    </Typography>
+                                                </CardContent>
+                                                <CardActions>
+                                                    <div className="align-items-right">
+                                                        <Button onClick={() => navigate('/article', { state: { articleId: article.id } })} size="small" sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'right' }}><CommentIcon /></Button>
+                                                    </div>
+                                                </CardActions>
+                                            </Card>
+                                        </Item>
+                                    </Grid>
+                                ))}
+                            </Grid>
+                        </Box>
+                    </Col>
+                </Row>
+            </Container>
         </div>
     );
 

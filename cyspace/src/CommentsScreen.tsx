@@ -8,7 +8,10 @@ import { useState, useEffect } from 'react';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import Card from '@mui/material/Card';;
+import Card from '@mui/material/Card';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import Container from 'react-bootstrap/Container';
 
 
 interface Article {
@@ -72,8 +75,8 @@ function CommentsScreen() {
         comment: ''
     })
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
+    const handleChange = (event: { target: { name: any; value: any; }; }) => {
+        const { name, value } = event.target;
         setFormData(prevData => ({ ...prevData, [name]: value }))
     }
 
@@ -141,72 +144,109 @@ function CommentsScreen() {
 
     return (
         <div>
-            <Card variant="outlined" sx={{ margin: 10 }}>
-                <Button onClick={() => navigate('/')} size="small" sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'left' }}>Back</Button>
-                <CardContent>
-                    <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14, textAlign: 'left' }}>
-                        <img src={article?.image_url} width={250} height={250}></img>
-                    </Typography>
-                    <Typography sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'right' }}>
-                        {convertDateToString(article?.published_at)}
-                    </Typography>
-                    <Typography gutterBottom sx={{ fontSize: 20, textAlign: 'left' }}>
-                        {article?.title}
-                    </Typography>
-                    <Typography sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'left' }}>
-                        {article?.news_site}/<a href={article?.url}>{article?.url}</a>
-                    </Typography>
-                </CardContent>
-
-            </Card>
-            <form onSubmit={handleSubmit}>
-                <div className="center">
-                    <label htmlFor="alias"> Username: </label>
-                    <br />
-                    <input type="text" name="alias" id="alias" onChange={handleChange} value={formData.alias} required maxLength={66}></input>
-                    <br />
-                </div>
-                <div className="center">
-                    <label htmlFor="comment"> Comment: </label>
-                    <br />
-                    <input className="input-text-comment" type="text" name="comment" id="comment" onChange={handleChange} value={formData.comment} required maxLength={4000}></input>
-                    <br />
-                </div>
-                <div className="center">
-                    <Button value="cancel" onClick={onCancel} type="reset" size="small" sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'right' }}>Cancel</Button>
-                    <Button value="publish" type="submit" size="small" sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'right' }}>Publish</Button>
-                </div>
-            </form>
-            <div>
-                <Box sx={{ flexGrow: 2 }}>
-                    <Grid
-                        container
-                        spacing={12}
-                        alignItems="left"
-                        justifyContent="left"
-                        direction="column">
-                        {comments?.map((comment) => (
-                            <Grid key={comment.id} size={{ xs: 8, md: 8 }}>
-                                <Item>
-                                    <Card variant="outlined" sx={{ margin: 10 }}>
-                                        <CardContent>
-                                            <Typography gutterBottom sx={{ fontSize: 20, textAlign: 'left' }}>
-                                                {comment.alias}
-                                            </Typography>
-                                            <Typography sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'right' }}>
-                                                {convertDateToString(comment.date)}
-                                            </Typography>
-                                            <Typography sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'left' }}>
-                                                {comment.comment}
-                                            </Typography>
-                                        </CardContent>
-                                    </Card>
-                                </Item>
-                            </Grid>
-                        ))}
-                    </Grid>
-                </Box>
-            </div>
+            <br/>
+            <Container>
+                <Row>
+                    <Col>
+                        <Button className="align-items-right" onClick={() => navigate('/')}>&lt; Back</Button>
+                        <Container>
+                            <Row>
+                                <Col>
+                                    <Box sx={{ flexGrow: 2 }}>
+                                        <Grid container 
+                                            spacing={12}
+                                            alignItems="center"
+                                            justifyContent="center"
+                                            direction="column"
+                                            size={{ md: 12 }}>
+                                            <img className="img-comment" src={article?.image_url}></img>
+                                        </Grid>
+                                    </Box>
+                                </Col>
+                            </Row>
+                        </Container>
+                        <br/>
+                        <Container>
+                            <Row>
+                                <Col>
+                                    <Item>
+                                        <Row>
+                                            <Col>
+                                                <h3>{article?.title}</h3>
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <Col>
+                                                {article?.news_site}/<a href={article?.url}>{article?.url}</a>
+                                            </Col>
+                                        </Row>
+                                    </Item>
+                                </Col>
+                            </Row>
+                        </Container>                        
+                    </Col>
+                </Row>
+            </Container>
+            <br/>
+            <Container>
+                <Row>
+                    <Col>
+                        <h3>{comments?.length} Comments</h3>
+                    </Col>
+                </Row>
+            </Container>
+            <br/>
+            <Container>
+                <Row>
+                    <Col>
+                        <form onSubmit={handleSubmit}>
+                            <div>
+                                <label htmlFor="alias"> Username: </label>
+                                <br />
+                                <input placeholder="e.g. john.smith" type="text" name="alias" id="alias" onChange={handleChange} value={formData.alias} required maxLength={66}></input>
+                                <br />
+                            </div>
+                            <div>
+                                <label htmlFor="comment"> Comment: </label>
+                                <br />
+                                <textarea placeholder="Write a comment..." className="input-text-comment" name="comment" id="comment" onChange={handleChange} value={formData.comment} required maxLength={4000}></textarea>
+                                <br />
+                            </div>
+                            <div className="align-right-button">
+                                <Button value="cancel" onClick={onCancel} type="reset" size="small" sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'right' }}>Cancel</Button>
+                                <Button value="publish" type="submit" size="small" sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'right' }}>Publish</Button>
+                            </div>
+                        </form>
+                    </Col>
+                </Row>
+            </Container>
+            <br/>
+            <Container>
+                <Row>
+                    <Col>
+                    {comments?.map((comment) => (
+                        <Row key={comment.id}>
+                            <Row>
+                                <Col>
+                                    <h3>{comment.alias}</h3>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col>
+                                    {convertDateToString(comment.date)}
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col>
+                                    {comment.comment}
+                                </Col>
+                            </Row>
+                            <br/>
+                            <br/>
+                        </Row>))}
+                    </Col>
+                </Row>
+            </Container>
         </div>
     );
 }

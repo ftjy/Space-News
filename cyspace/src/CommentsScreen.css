@@ -4,8 +4,16 @@
   word-break: break-word;
 }
 
-.center {
+.align-comment-center {
   margin: auto;
   width: 50%;
   padding: 10px;
+}
+
+.img-comment {
+  max-width: 100%;
+}
+
+.align-right-button {
+  margin-left: 23rem;
 }
