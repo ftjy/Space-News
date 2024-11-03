@@ -66,7 +66,6 @@ app.post('/api/articles/search/date', jsonParser, async (req: Request, res: Resp
           published_at_lte: endDate
         }
       });
-    // console.log(response.data);
     res.send(response.data);
   } catch (error) {
     res.status(500).json({ message: 'Error occurred' });
@@ -93,10 +92,11 @@ app.post('/api/articles/comment/create', jsonParser, async (req: Request, res: R
 });
 
 app.get('/api/articles/comment/retrieve/:articleId', async (req: Request, res: Response) => {
-  const articleId = req.query;
+  const { articleId } = req.params;
+  console.log(articleId);
   try {
     const comment = await prisma.comment.findMany({
-      where: articleId
+      where: { articleId: Number(articleId) }
     });
     res.send(comment);
   } catch (error) {
