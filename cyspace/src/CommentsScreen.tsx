@@ -66,40 +66,41 @@ function CommentsScreen() {
     const [error, setError] = useState<string | null>(null);
     const [comments, setComments] = useState<Comment[]>();
     const navigate = useNavigate();
-    const [formData, setFormData] = useState<commentState> ({
+    const [formData, setFormData] = useState<commentState>({
         articleId: articleId,
         alias: '',
         comment: ''
     })
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const {name, value} = e.target;
-        setFormData(prevData => ({...prevData, [name]: value}))
+        const { name, value } = e.target;
+        setFormData(prevData => ({ ...prevData, [name]: value }))
     }
 
     const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
-          const response = await fetch('http://localhost:3000/api/articles/comment/create', {
-            headers: { 'Content-type': 'application/json' },
-            method: 'POST',
-            body: JSON.stringify({formData})
-        })
-        .then(async () => {
-            setComments(await getCommentsByArticleId(articleId));
-        })
-        .then(()=> onCancel());
-          console.log(response);
-        }catch (error) {
-          console.error(error);
+            const response = await fetch('http://localhost:3000/api/articles/comment/create', {
+                headers: { 'Content-type': 'application/json' },
+                method: 'POST',
+                body: JSON.stringify({ formData })
+            })
+                .then(async () => {
+                    setComments(await getCommentsByArticleId(articleId));
+                })
+                .then(() => onCancel());
+            console.log(response);
+        } catch (error) {
+            console.error(error);
         }
     }
-    
-    function onCancel(){
+
+    function onCancel() {
         setFormData({
             articleId: articleId,
             alias: '',
-            comment: ''})
+            comment: ''
+        })
     };
 
     async function getArticleById(id: number): Promise<Article> {
@@ -108,7 +109,7 @@ function CommentsScreen() {
         const data = await response.json();
         return data;
     }
-    
+
     async function getCommentsByArticleId(id: number): Promise<Comment[]> {
         const response = await fetch('http://localhost:3000/api/articles/comment/retrieve/' + id);
         console.log(response);
@@ -128,7 +129,7 @@ function CommentsScreen() {
             console.error(error);
         }
     }
-    
+
 
     useEffect(() => {
         fetchData();
@@ -159,20 +160,22 @@ function CommentsScreen() {
 
             </Card>
             <form onSubmit={handleSubmit}>
-                <div>
+                <div className="center">
                     <label htmlFor="alias"> Username: </label>
-                    <br/>
+                    <br />
                     <input type="text" name="alias" id="alias" onChange={handleChange} value={formData.alias} required maxLength={66}></input>
-                    <br/>
+                    <br />
                 </div>
-                <div>
+                <div className="center">
                     <label htmlFor="comment"> Comment: </label>
-                    <br/>
+                    <br />
                     <input className="input-text-comment" type="text" name="comment" id="comment" onChange={handleChange} value={formData.comment} required maxLength={4000}></input>
-                    <br/>
+                    <br />
                 </div>
-                <Button value="cancel" onClick={onCancel}type="reset" size="small" sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'right' }}>Cancel</Button>
-                <Button value="publish" type="submit" size="small" sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'right' }}>Publish</Button>
+                <div className="center">
+                    <Button value="cancel" onClick={onCancel} type="reset" size="small" sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'right' }}>Cancel</Button>
+                    <Button value="publish" type="submit" size="small" sx={{ color: 'text.secondary', mb: 1.5, fontSize: 14, textAlign: 'right' }}>Publish</Button>
+                </div>
             </form>
             <div>
                 <Box sx={{ flexGrow: 2 }}>
@@ -208,4 +211,4 @@ function CommentsScreen() {
     );
 }
 
-export default CommentsScreen;
+export default CommentsScreen;

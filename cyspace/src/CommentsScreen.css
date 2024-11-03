@@ -1,5 +1,11 @@
 .input-text-comment {
-    height:500px;
-    width:500px;
-    word-break: break-word;
+  height: 500px;
+  width: 500px;
+  word-break: break-word;
+}
+
+.center {
+  margin: auto;
+  width: 50%;
+  padding: 10px;
 }
