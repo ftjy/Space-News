@@ -1,11 +1,15 @@
 import express, { Request, Response } from 'express';
 import axios from 'axios';
 import { PrismaClient } from '@prisma/client';
+import { json } from 'body-parser';
 
 const app = express();
 const cors = require('cors');
 const dotenv = require("dotenv");
 const prisma = new PrismaClient();
+const bodyParser = require('body-parser');
+const jsonParser = bodyParser.json();
+const urlencodedParser = bodyParser.urlencoded({ extended: false })
 const PORT = process.env.PORT || 3000;
 const BASEURL = 'https://api.spaceflightnewsapi.net/v4/articles/';
 
@@ -50,17 +54,20 @@ app.get('/api/articles/search/:titleText', async (req: Request, res: Response) =
   }
 });
 
-app.post('/api/articles/comment/create', async (req: Request, res: Response) => {
+app.post('/api/articles/comment/create', jsonParser, async (req: Request, res: Response) => {
+  console.log(req.body.alias.toLowerCase());
+  console.log(req.body.comment);
   try {
-    await prisma.comment.create({
+    const result = await prisma.comment.create({
       data: {
-        username: "Alan",
-        alias: "aLan",
-        comment: "Hello I am here!",
+        articleId: req.body.articleId,
+        username: req.body.alias.toLowerCase(),
+        alias: req.body.alias,
+        comment: req.body.comment,
         date: new Date()
       }
     });
-    res.send("Success!");
+    res.send(result);
   } catch (error) {
     res.status(500).json({ message: 'Error occurred' });
   }
@@ -72,12 +79,7 @@ app.get('/api/articles/comment/retrieve/:username', async (req: Request, res: Re
     const comment = await prisma.comment.findMany({
       where: username
     });
-    if (comment) {
-      res.send(comment);
-      // res.status(200).json(comment);
-    } else {
-      // res.status(404).json({ message: "Comment not found" });
-    }
+    res.send(comment);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Error fetching comment" });

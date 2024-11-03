@@ -15,6 +15,7 @@ datasource db {
 
 model comment {
   id Int @id @default(autoincrement())
+  articleId Int
   username String
   alias String
   comment String
