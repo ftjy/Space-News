@@ -8,7 +8,7 @@ import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid2';
 import Paper from '@mui/material/Paper';
 import { styled } from '@mui/material/styles';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { InputAdornment, TextField } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
@@ -22,6 +22,8 @@ import { DateValidationError } from '@mui/x-date-pickers/models';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
+import useFetch from "./Hooks/useFetch";
+import Loader from "./Components/Loader";
 
 
 interface ArticleResponse {
@@ -45,6 +47,7 @@ interface Article {
 }
 
 interface topCommenters {
+    id: number;
     username: string;
     count: number;
 }
@@ -73,7 +76,8 @@ const Item = styled(Paper)(({ theme }) => ({
 
 function ArticlesScreen() {
     const [articleResponse, setArticleResponse] = useState<ArticleResponse>();
-    const [error, setError] = useState<string | null>(null);
+    const [articles, setArticles] = useState<Article[]>([])
+    const [errorFetchData, setErrorFetchData] = useState<string | null>(null);
     const [searchString, setSearchString] = useState<String>();
     const [startDate, setStartDate] = useState<Dayjs>();
     const [endDate, setEndDate] = useState<Dayjs>();
@@ -83,6 +87,8 @@ function ArticlesScreen() {
     const [endDateErrorMsg, setEndDateErrorMsg] = React.useState<DateValidationError | null>(null);
     const [avgCommentsPerDay, setAvgCommentsPerDay] = useState<number>();
     const [topCommenters, setTopCommenters] = useState<topCommenters[]>();
+    const [fetchArticleResponse, { articleData, loadingData, errorData }] = useFetch<ArticleResponse>();
+    const articleResponseRef = useRef<ArticleResponse>();
     const navigate = useNavigate();
 
     function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
@@ -98,6 +104,7 @@ function ArticlesScreen() {
         const searchResults = await searchArticles(text);
         console.log(searchResults);
         setArticleResponse(searchResults);
+        setArticles(searchResults.results)
     }
 
     async function searchByDate() {
@@ -107,6 +114,7 @@ function ArticlesScreen() {
             const searchResults = await searchArticlesByDate(startDateIso!, endDateIso!);
             console.log(searchResults);
             setArticleResponse(searchResults);
+            setArticles(searchResults.results);
         } else if (dayjs(startDate).isValid()) {
             // error message for beforeDate
         } else if (dayjs(endDate).isValid()) {
@@ -155,26 +163,56 @@ function ArticlesScreen() {
 
     async function fetchData() {
         try {
-            const articles = await getArticles();
+            const articleResponseData = await getArticles();
             const topComments = await getTopComments();
             const avgComments = await getAvgComments();
-            console.log(articles);
+            console.log(articleResponseData);
             console.log(topComments);
             console.log(avgComments);
-            setArticleResponse(articles);
+            setArticleResponse(articleResponseData);
             setTopCommenters(topComments);
             setAvgCommentsPerDay(avgComments[0].countperday);
-        } catch (error) {
-            console.error(error);
+            setArticles(articleResponseData.results)
+        } catch (errorFetchData) {
+            console.error(errorFetchData);
         }
     }
+
+    const handleScroll = useCallback(async () => {
+        if (
+          window.innerHeight + window.scrollY >= document.body.scrollHeight - 1 && !loadingData
+        ) {
+            console.log(articleResponseRef.current);
+            if (typeof articleResponseRef.current !== "undefined"){
+                await fetchArticleResponse(articleResponseRef.current.next);
+            }
+        }
+      }, []);
+
+    
+    useEffect(() => {
+        articleResponseRef.current = articleResponse;
+    }, [articleResponse]);
+
+    useEffect(() => {
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, [loadingData]);
 
     useEffect(() => {
         fetchData();
     }, []);
+    
+    useEffect(() => {
+        console.log("Enter useEffect4")
+        if (!loadingData && articleData && articleData?.count > 0) {
+            setArticles((prevArticles) => [...prevArticles, ...articleData.results]);
+            setArticleResponse(articleData);
+        }
+        }, [articleData, loadingData]);
 
-    if (error) {
-        return <div>Error: {error}</div>;
+    if (errorFetchData) {
+        return <div>Error: {errorFetchData}</div>;
     }
 
     return (
@@ -197,7 +235,7 @@ function ArticlesScreen() {
                                 </Col>
                             </Row>
                             {topCommenters?.map((topComment) => (
-                            <Row>
+                            <Row key={topComment.id}>
                                 <Col>
                                     {topComment.username}
                                 </Col>
@@ -305,7 +343,7 @@ function ArticlesScreen() {
                                 alignItems="center"
                                 justifyContent="center"
                                 direction="column">
-                                {articleResponse?.results?.map((article) => (
+                                {articles.map((article) => (
                                     <Grid key={article.id} size={{ md: 12 }}>
                                         <Item>
                                             <Card variant="outlined" sx={{ margin: 10 }}>
@@ -332,6 +370,13 @@ function ArticlesScreen() {
                                         </Item>
                                     </Grid>
                                 ))}
+                                {loadingData && (
+                                    <>
+                                    <Loader />
+                                    <Loader />
+                                    </>
+                                )}
+                                {errorData && <div>Error: {errorData}</div>}
                             </Grid>
                         </Box>
                     </Col>

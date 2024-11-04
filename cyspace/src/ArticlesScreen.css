@@ -29,5 +29,25 @@
 }
 
 .datepicker-split-empty-space{
-  padding: 1rem;
+  padding-left: 4rem;
+  padding-right: 4rem;
+}
+
+.shimmer-wrapper {
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.shimmerBG {
+  height: 400px; /* Set the height to 100% to fill the container */
+  width: 600px;
+  border: 1px solid #ccc;
+  animation-duration: 2.2s;
+  animation-iteration-count: infinite;
+  animation-name: shimmer;
+  animation-timing-function: linear;
+  background: #b9b6b6;
+  /* background: linear-gradient(to right, #f6f6f6 8%, #f0f0f0 18%, #f6f6f6 33%); */
+  background-size: 300% 100%; /* Adjusted background-size */
 }

@@ -122,7 +122,7 @@ app.get('/api/articles/comment/retrieve/:articleId', async (req: Request, res: R
 
 app.get('/api/articles/comment/retrieve/commenters/top', async (req: Request, res: Response) => {
   try {
-    const comments = await prisma.$queryRaw`SELECT username, COUNT(username) as count FROM public.comment group by username order by count desc limit 3;`
+    const comments = await prisma.$queryRaw`SELECT min(id), username, COUNT(username) as count FROM public.comment group by username order by count desc limit 3;`
     console.log(jsonConvert(comments));
     res.send(jsonConvert(comments));
   } catch (error) {
