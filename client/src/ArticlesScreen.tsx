@@ -220,7 +220,7 @@ function ArticlesScreen() {
             <Container>
                 <Row>
                     <Col>
-                        <h1>Space Blog</h1>
+                        <h1>Space News</h1>
                     </Col>
                 </Row>
             </Container>
