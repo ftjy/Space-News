@@ -1,0 +1,19 @@
+.input-text-comment {
+  height: 500px;
+  width: 500px;
+  word-break: break-word;
+}
+
+.align-comment-center {
+  margin: auto;
+  width: 50%;
+  padding: 10px;
+}
+
+.img-comment {
+  max-width: 100%;
+}
+
+.align-right-button {
+  margin-left: 23rem;
+}

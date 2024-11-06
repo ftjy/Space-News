@@ -1,0 +1,53 @@
+.title-container {
+    box-shadow: inset;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 100%;
+    padding: 1rem;
+  }
+
+.align-items-right {
+  margin-left: auto;
+  margin-right: 0;
+  padding: 10px;
+}
+
+.search-button-right {
+  float: right;
+}
+
+.search-button {
+  background-color: #e7e7e7; color: black;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+
+.datepicker-split-empty-space{
+  padding-left: 4rem;
+  padding-right: 4rem;
+}
+
+.shimmer-wrapper {
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.shimmerBG {
+  height: 400px; /* Set the height to 100% to fill the container */
+  width: 600px;
+  border: 1px solid #ccc;
+  animation-duration: 2.2s;
+  animation-iteration-count: infinite;
+  animation-name: shimmer;
+  animation-timing-function: linear;
+  background: #b9b6b6;
+  /* background: linear-gradient(to right, #f6f6f6 8%, #f0f0f0 18%, #f6f6f6 33%); */
+  background-size: 300% 100%; /* Adjusted background-size */
+}
